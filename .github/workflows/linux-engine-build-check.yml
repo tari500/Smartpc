@@ -1,0 +1,81 @@
+name: Check SmartPC Linux Engine Build
+
+on:
+  push:
+    branches:
+      - feature/linux-engine-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux-engine:
+    name: Build Android-compatible Linux engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SmartPC
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK and NDK r27c
+        uses: android-actions/setup-android@v3
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platforms;android-37" "build-tools;35.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Set up Rust for Android ARM64
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Download complete upstream Linux engine source
+        run: git clone --recurse-submodules --depth 1 https://github.com/oonid/pr.git linux-engine
+
+      - name: Build patched PRoot and Android loader
+        working-directory: linux-engine
+        run: |
+          chmod +x scripts/build.sh scripts/build-pr-cli.sh
+          scripts/build.sh --arch=arm64
+
+      - name: Build pr-cli and embedded guest test binary
+        working-directory: linux-engine
+        run: scripts/build-pr-cli.sh
+
+      - name: Place native engine libraries
+        working-directory: linux-engine
+        run: |
+          mkdir -p android/proot-engine/src/main/jniLibs/arm64-v8a
+          cp build/out/arm64/proot android/proot-engine/src/main/jniLibs/arm64-v8a/libproot.so
+          cp build/out/arm64/loader android/proot-engine/src/main/jniLibs/arm64-v8a/libproot-loader.so
+          cp src/pr-cli/target/aarch64-linux-android/release/pr-cli android/proot-engine/src/main/jniLibs/arm64-v8a/libpr-cli.so
+
+      - name: Build upstream engine library
+        working-directory: linux-engine/android
+        run: |
+          chmod +x gradlew
+          ./gradlew :proot-engine:assembleDebug
+
+      - name: Build current SmartPC baseline APK
+        run: |
+          gradle --version || true
+          chmod +x gradlew 2>/dev/null || true
+          if [ -f gradlew ]; then ./gradlew assembleDebug; else gradle assembleDebug; fi
+
+      - name: Upload engine build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartPC-Linux-Engine-Build-Test
+          path: |
+            linux-engine/android/proot-engine/build/outputs/aar/*.aar
+            linux-engine/android/proot-engine/build/outputs/aar/*/*.aar
+            app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
+          retention-days: 14
