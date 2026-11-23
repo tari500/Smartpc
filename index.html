@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#081426"><title>SmartPC</title>
+<style>
+:root{--accent:#59b7ff;--panel:rgba(10,24,44,.91);--line:rgba(255,255,255,.13)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#f4f8ff}
+body{background:radial-gradient(ellipse at 75% 15%,#245b88 0%,transparent 42%),linear-gradient(135deg,#071426,#102b49 55%,#07101f)}
+.desktop{height:100%;padding:22px 16px 76px;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:750;letter-spacing:.3px;font-size:20px}
+.logo{width:35px;height:35px;border-radius:11px;background:linear-gradient(145deg,#76d4ff,#2874db);display:grid;place-items:center;color:#06172b;font-weight:900}
+.sub{color:#a9c2dc;font-size:12px;margin:4px 0 25px 45px}
+.icons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 10px;max-width:360px}
+.app{border:1px solid transparent;background:transparent;color:white;text-align:center;padding:8px 3px;border-radius:14px;min-height:88px}
+.app:active{background:#ffffff18;border-color:#ffffff2c}
+.appico{width:48px;height:48px;border-radius:15px;margin:0 auto 7px;display:grid;place-items:center;font-size:22px;background:linear-gradient(145deg,#284b70,#142c49);border:1px solid #ffffff22}
+.app span{font-size:12px}
+.status{position:absolute;right:16px;top:25px;color:#b8cee2;font-size:11px}
+.taskbar{position:absolute;bottom:0;left:0;right:0;height:64px;background:rgba(5,13,25,.91);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:18px;padding:0 12px}
+.start{width:43px;height:43px;border:0;border-radius:13px;background:linear-gradient(145deg,#69cfff,#2875df);font-size:21px;color:#07172a}
+.taskbtn{border:1px solid var(--line);background:#ffffff0c;color:white;border-radius:12px;padding:10px 13px;font-size:12px}
+.clock{margin-left:auto;color:#c4d7e9;font-size:12px;text-align:right;min-width:52px}
+.panel{display:none;position:absolute;bottom:74px;left:12px;right:12px;max-width:430px;margin:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 18px 50px #0008;backdrop-filter:blur(20px)}
+.panel.show{display:block}.panel h3{margin:0 0 12px}.panelgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tile{padding:13px;border-radius:13px;background:#ffffff0c;border:1px solid var(--line);font-size:13px}
+.window{display:none;position:absolute;inset:75px 12px 80px;background:#101e30;border:1px solid #ffffff30;border-radius:18px;box-shadow:0 20px 60px #0009;overflow:hidden}
+.window.show{display:block}.winhead{height:48px;background:#172a40;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-weight:650}
+.close{border:0;background:#ffffff18;color:white;border-radius:9px;padding:7px 11px}
+.winbody{padding:17px;color:#dceaff;font-size:14px;line-height:1.55}
+.field{width:100%;padding:12px;border-radius:10px;border:1px solid #ffffff25;background:#081526;color:white;margin:9px 0}
+.action{background:#247dd0;border:0;color:white;padding:11px 14px;border-radius:10px;font-weight:650}
+.note{color:#9fb5cb;font-size:12px;margin-top:14px}
+</style></head>
+<body>
+<div class="desktop">
+ <div class="brand"><div class="logo">S</div>SmartPC</div>
+ <div class="sub">Your pocket desktop · Version 1.0</div>
+ <div class="status" id="status">LOCAL DESKTOP</div>
+ <div class="icons">
+  <button class="app" onclick="openWin('files')"><div class="appico">📁</div><span>Files</span></button>
+  <button class="app" onclick="openWin('browser')"><div class="appico">🌐</div><span>Browser</span></button>
+  <button class="app" onclick="openWin('terminal')"><div class="appico">⌘</div><span>Terminal</span></button>
+  <button class="app" onclick="openWin('system')"><div class="appico">⚙️</div><span>System info</span></button>
+  <button class="app" onclick="openWin('apps')"><div class="appico">▦</div><span>Apps</span></button>
+  <button class="app" onclick="openWin('about')"><div class="appico">ⓘ</div><span>About</span></button>
+ </div>
+ <div class="panel" id="startPanel">
+  <h3>Start</h3><div class="panelgrid">
+   <div class="tile" onclick="openWin('files')">📁 &nbsp; File manager</div>
+   <div class="tile" onclick="openWin('browser')">🌐 &nbsp; Internet</div>
+   <div class="tile" onclick="openWin('terminal')">⌘ &nbsp; Terminal</div>
+   <div class="tile" onclick="openWin('system')">⚙️ &nbsp; Settings</div>
+  </div>
+ </div>
+ <div class="window" id="win">
+  <div class="winhead"><span id="winTitle">SmartPC</span><button class="close" onclick="closeWin()">Close ✕</button></div>
+  <div class="winbody" id="winBody"></div>
+ </div>
+</div>
+<div class="taskbar">
+ <button class="start" onclick="toggleStart()">▦</button>
+ <button class="taskbtn" onclick="openWin('files')">📁 Files</button>
+ <button class="taskbtn" onclick="openWin('browser')">🌐 Web</button>
+ <div class="clock" id="clock">--:--<br><span>SmartPC</span></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+function toggleStart(){$('startPanel').classList.toggle('show')}
+function closeWin(){$('win').classList.remove('show')}
+function openWin(name){
+ $('startPanel').classList.remove('show');$('win').classList.add('show');
+ const data={
+ files:['File manager',`<b>Phone storage</b><p>SmartPC can open your Android files in a future update.</p><p class="note">File access is not enabled in this first preview.</p>`],
+ browser:['Web browser',`Enter a website address:<input class="field" id="url" value="https://www.google.com"><button class="action" onclick="goWeb()">Open in browser</button><p class="note">Web pages open in your phone's browser in version 1.0.</p>`],
+ terminal:['Terminal',`<div style="font-family:monospace;background:#050b13;padding:13px;border-radius:10px">SmartPC shell preview<br>smartpc@android:~$<br><span style="color:#70d5a5">Terminal engine will be added in a later build.</span></div>`],
+ system:['System information',`<b>SmartPC 1.0</b><p>Host: Android</p><p>Desktop: SmartPC Mobile Shell</p><p>Virtual machine: Not installed yet</p><p class="note">Designed for the OPPO A56 5G and other Android devices.</p>`],
+ apps:['Applications',`<p>Available desktop tools</p><div class="tile">🌐 Web shortcut</div><br><div class="tile">📁 File manager preview</div><br><div class="tile">⌘ Terminal preview</div><p class="note">Linux and Windows application engines are planned for later releases.</p>`],
+ about:['About SmartPC',`<b>SmartPC</b><p>A mobile desktop project built for Android.</p><p>Version 1.0 · First interface preview</p><p class="note">This release is a desktop shell, not yet a full PC emulator.</p>`]
+ };
+ $('winTitle').textContent=data[name][0];$('winBody').innerHTML=data[name][1];
+}
+function goWeb(){let v=$('url').value.trim();if(v&&window.SmartPC)SmartPC.openBrowser(v);else if(v)location.href=v}
+function tick(){let d=new Date();$('clock').innerHTML=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'<br><span>SmartPC</span>'}
+tick();setInterval(tick,10000);
+</script></body></html>
