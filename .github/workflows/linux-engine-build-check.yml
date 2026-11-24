@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Android SDK components
         run: |
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" "cmake;3.22.1"
+          sdkmanager --channel=3 "platforms;android-37" "build-tools;37.0.0" "cmake;3.22.1"
 
       - name: Set up Rust for Android ARM64
         uses: dtolnay/rust-toolchain@stable
@@ -68,11 +68,6 @@ jobs:
           cp build/out/arm64/loader android/proot-engine/src/main/jniLibs/arm64-v8a/libproot-loader.so
           test -s android/proot-engine/src/main/jniLibs/arm64-v8a/libpr-cli.so
           ls -lh android/proot-engine/src/main/jniLibs/arm64-v8a/
-
-      - name: Configure stable Android API level
-        working-directory: linux-engine/android
-        run: |
-          find . -name 'build.gradle.kts' -print0 | xargs -0 sed -i 's/compileSdk = 37/compileSdk = 36/g'
 
       - name: Brand the functional Linux app as SmartPC
         working-directory: linux-engine/android
