@@ -26,19 +26,19 @@ s = s.replace(needle, addition, 1)
 marker = """    companion object {
         fun isValidOverrideAlias(alias: String): Boolean {"""
 replacement = """    companion object {
-        private const val DESKTOP_SETUP_SCRIPT = """
-            set -e
-            export DEBIAN_FRONTEND=noninteractive
-            dpkg --configure -a
-            apt-get update
-            apt-get install -y xfce4 xfce4-terminal tigervnc-standalone-server dbus-x11
-            mkdir -p /root/.vnc
-            printf '%s\\n' '#!/bin/sh' 'unset SESSION_MANAGER' 'unset DBUS_SESSION_BUS_ADDRESS' 'exec startxfce4' > /root/.vnc/xstartup
-            chmod 700 /root/.vnc
-            chmod +x /root/.vnc/xstartup
-            echo 'XFCE desktop and TigerVNC are installed.'
-            echo 'Use a VNC viewer to display the desktop after configuring a VNC password.'
-        """
+        private val DESKTOP_SETUP_SCRIPT = listOf(
+            "set -e",
+            "export DEBIAN_FRONTEND=noninteractive",
+            "dpkg --configure -a",
+            "apt-get update",
+            "apt-get install -y xfce4 xfce4-terminal tigervnc-standalone-server dbus-x11",
+            "mkdir -p /root/.vnc",
+            "printf '%s\\n' '#!/bin/sh' 'unset SESSION_MANAGER' 'unset DBUS_SESSION_BUS_ADDRESS' 'exec startxfce4' > /root/.vnc/xstartup",
+            "chmod 700 /root/.vnc",
+            "chmod +x /root/.vnc/xstartup",
+            "echo 'XFCE desktop and TigerVNC are installed.'",
+            "echo 'Use a VNC viewer to display the desktop after configuring a VNC password.'"
+        ).joinToString("\\n")
 
         fun isValidOverrideAlias(alias: String): Boolean {"""
 if marker not in s:
