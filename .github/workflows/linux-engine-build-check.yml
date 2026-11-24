@@ -70,7 +70,8 @@ jobs:
           ls -lh android/proot-engine/src/main/jniLibs/arm64-v8a/
 
       - name: Add one-tap XFCE desktop setup for installed Linux distros
-        run: python3 scripts/patch_upstream_desktop.py
+        working-directory: linux-engine
+        run: python3 ../scripts/patch_upstream_desktop.py
 
       - name: Brand the functional Linux app as SmartPC
         working-directory: linux-engine/android
