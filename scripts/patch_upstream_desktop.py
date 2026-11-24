@@ -134,3 +134,93 @@ if old not in s:
     raise SystemExit("Distro overflow menu insertion point not found")
 s = s.replace(old, new, 1)
 main.write_text(s)
+
+
+# Install an embedded noVNC screen in the Android app.
+main = Path("android/app/src/main/java/id/or/oo/pr/MainActivity.kt")
+main_text = main.read_text()
+if "class DesktopActivity" not in main_text:
+    marker = "\n@OptIn(ExperimentalMaterial3Api::class)\n@Composable\nfun DistroListScreen"
+    activity = r"""
+
+class DesktopActivity : ComponentActivity() {
+    @Suppress("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val viewer = android.webkit.WebView(this)
+        viewer.settings.javaScriptEnabled = true
+        viewer.settings.domStorageEnabled = true
+        viewer.settings.allowFileAccess = true
+        viewer.webViewClient = android.webkit.WebViewClient()
+        viewer.loadUrl("file:///android_asset/novnc/vnc.html?host=127.0.0.1&port=6080&autoconnect=true&resize=scale")
+        setContentView(viewer)
+    }
+}
+"""
+    if marker not in main_text:
+        raise SystemExit("Desktop viewer insertion point not found")
+    main_text = main_text.replace(marker, activity + marker, 1)
+
+old_call = """                    onClose = ::dismissOutput,
+                    onCancel = app.operations::cancel,
+                )"""
+new_call = """                    onClose = ::dismissOutput,
+                    onCancel = app.operations::cancel,
+                    onOpenDesktop = if (current.kind == DistroOperations.Kind.StartDesktop && !current.running && current.exitCode == 0) {
+                        { context.startActivity(Intent(context, DesktopActivity::class.java)) }
+                    } else null,
+                )"""
+if old_call in main_text:
+    main_text = main_text.replace(old_call, new_call, 1)
+elif "onOpenDesktop =" not in main_text:
+    raise SystemExit("Output console call site not found")
+
+old_signature = """    onClose: () -> Unit,
+    onCancel: () -> Unit,
+) {"""
+new_signature = """    onClose: () -> Unit,
+    onCancel: () -> Unit,
+    onOpenDesktop: (() -> Unit)? = null,
+) {"""
+if old_signature in main_text:
+    main_text = main_text.replace(old_signature, new_signature, 1)
+
+old_buttons = """            if (isRunning) {
+                OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
+                    Text("Cancel")
+                }
+            }
+            Button(
+                onClick = onClose,
+                enabled = !isRunning,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(if (isRunning) "Running…" else "Close")
+            }"""
+new_buttons = """            if (isRunning) {
+                OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
+                    Text("Cancel")
+                }
+            }
+            if (onOpenDesktop != null) {
+                Button(onClick = onOpenDesktop, modifier = Modifier.weight(1f)) {
+                    Text("Open Desktop")
+                }
+            }
+            Button(
+                onClick = onClose,
+                enabled = !isRunning,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(if (isRunning) "Running…" else "Close")
+            }"""
+if old_buttons in main_text:
+    main_text = main_text.replace(old_buttons, new_buttons, 1)
+main.write_text(main_text)
+
+manifest = Path("android/app/src/main/AndroidManifest.xml")
+manifest_text = manifest.read_text()
+if 'android:name=".DesktopActivity"' not in manifest_text:
+    manifest_text = manifest_text.replace("</application>", '<activity android:name=".DesktopActivity" android:exported="false" />\n    </application>')
+manifest_text = manifest_text.replace('android:usesCleartextTraffic="false"', 'android:usesCleartextTraffic="true"')
+manifest.write_text(manifest_text)
