@@ -49,13 +49,12 @@ replacement = """    companion object {
             "mkdir -p /root/.vnc",
             "if [ ! -x /usr/bin/vncserver ]; then echo 'Desktop is not installed. Choose Install XFCE desktop first.'; exit 1; fi",
             "if vncserver -list 2>/dev/null | grep -q ':1'; then vncserver -kill :1 >/dev/null 2>&1 || true; fi",
-            "VNC_PASS=$(od -An -N8 -tx1 /dev/urandom | tr -d ' \\n')",
-            "printf '%s\\n' \"$VNC_PASS\" | vncpasswd -f > /root/.vnc/passwd",
+            "printf '%s\\n' smartpc | vncpasswd -f > /root/.vnc/passwd",
             "chmod 600 /root/.vnc/passwd",
-            "vncserver :1 -localhost no -geometry 1280x720 -depth 24",
+            "vncserver :1 -localhost yes -geometry 1280x720 -depth 24",
             "echo 'XFCE desktop started.'",
             "echo 'VNC address: 127.0.0.1:5901'",
-            "echo \"VNC password: $VNC_PASS\"",
+            "echo 'VNC password: smartpc'",
             "echo 'Connect with a VNC Viewer app on this same phone.'"
         ).joinToString("\\n")
 
