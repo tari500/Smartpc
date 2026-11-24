@@ -42,8 +42,13 @@ jobs:
           git config --global url."https://github.com/".insteadOf "git@github.com:"
           git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-      - name: Download complete Linux engine and Android application
-        run: git clone --recurse-submodules --depth 1 https://github.com/oonid/pr.git linux-engine
+      - name: Download Linux engine source and initialize HTTPS submodules
+        run: |
+          git clone --depth 1 https://github.com/oonid/pr.git linux-engine
+          cd linux-engine
+          sed -i 's#git@github.com:#https://github.com/#g' .gitmodules
+          git submodule sync
+          git -c protocol.version=2 submodule update --init --depth 1
 
       - name: Build Android ARM64 PRoot engine
         working-directory: linux-engine
