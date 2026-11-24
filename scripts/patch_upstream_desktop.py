@@ -36,7 +36,7 @@ replacement = """    companion object {
             "export DEBIAN_FRONTEND=noninteractive",
             "dpkg --configure -a",
             "apt-get update",
-            "apt-get install -y xfce4 xfce4-terminal tigervnc-standalone-server dbus-x11",
+            "apt-get install -y xfce4 xfce4-terminal tigervnc-standalone-server dbus-x11 websockify",
             "mkdir -p /root/.vnc",
             "printf '%s\\n' '#!/bin/sh' 'unset SESSION_MANAGER' 'unset DBUS_SESSION_BUS_ADDRESS' 'exec startxfce4' > /root/.vnc/xstartup",
             "chmod 700 /root/.vnc",
@@ -55,7 +55,7 @@ replacement = """    companion object {
             "echo 'XFCE desktop started.'",
             "echo 'VNC address: 127.0.0.1:5901'",
             "echo 'VNC password: smartpc'",
-            "echo 'Connect with a VNC Viewer app on this same phone.'"
+            "nohup websockify 6080 127.0.0.1:5901 >/tmp/smartpc-websockify.log 2>&1 </dev/null &",\n            "echo 'Open Desktop inside SmartPC to view XFCE.'"
         ).joinToString("\\n")
 
         fun isValidOverrideAlias(alias: String): Boolean {"""
