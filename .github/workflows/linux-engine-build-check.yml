@@ -69,6 +69,7 @@ jobs:
           test -s android/proot-engine/src/main/jniLibs/arm64-v8a/libpr-cli.so
           ls -lh android/proot-engine/src/main/jniLibs/arm64-v8a/
 
+      # Desktop setup patch is maintained in scripts/patch_upstream_desktop.py
       - name: Add one-tap XFCE desktop setup for installed Linux distros
         working-directory: linux-engine
         run: python3 ../scripts/patch_upstream_desktop.py
