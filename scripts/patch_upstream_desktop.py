@@ -1,5 +1,18 @@
 from pathlib import Path
 
+# Android sessions are attached to a PTY, but explicitly request an interactive
+# login shell so the prompt and terminal input are initialized consistently.
+login = Path("src/pr-cli/src/login.rs")
+login_text = login.read_text()
+old_shell = 'let mut cmd_args = vec!["/bin/sh".to_string(), "-l".to_string()];'
+new_shell = 'let mut cmd_args = vec!["/bin/sh".to_string(), "-l".to_string(), "-i".to_string()];'
+if old_shell not in login_text:
+    raise SystemExit("PRoot login shell initialization not found")
+login_text = login_text.replace(old_shell, new_shell, 1)
+login_text = login_text.replace('strings(&["/bin/sh", "-l"])', 'strings(&["/bin/sh", "-l", "-i"])')
+login_text = login_text.replace('strings(&["/bin/sh", "-l", "-c",', 'strings(&["/bin/sh", "-l", "-i", "-c",')
+login.write_text(login_text)
+
 ops = Path("android/app/src/main/java/id/or/oo/pr/DistroOperations.kt")
 s = ops.read_text()
 old_kind = 'enum class Kind(val label: String) { Install("Installing"), Remove("Removing"), Test("Testing") }'
