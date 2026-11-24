@@ -50,6 +50,11 @@ jobs:
           git submodule sync
           git -c protocol.version=2 submodule update --init --depth 1
 
+      # Desktop setup patch is maintained in scripts/patch_upstream_desktop.py
+      - name: Add one-tap XFCE desktop setup for installed Linux distros
+        working-directory: linux-engine
+        run: python3 ../scripts/patch_upstream_desktop.py
+
       - name: Build Android ARM64 PRoot engine
         working-directory: linux-engine
         run: |
@@ -68,11 +73,6 @@ jobs:
           cp build/out/arm64/loader android/proot-engine/src/main/jniLibs/arm64-v8a/libproot-loader.so
           test -s android/proot-engine/src/main/jniLibs/arm64-v8a/libpr-cli.so
           ls -lh android/proot-engine/src/main/jniLibs/arm64-v8a/
-
-      # Desktop setup patch is maintained in scripts/patch_upstream_desktop.py
-      - name: Add one-tap XFCE desktop setup for installed Linux distros
-        working-directory: linux-engine
-        run: python3 ../scripts/patch_upstream_desktop.py
 
       - name: Bundle noVNC desktop viewer assets
         run: |
