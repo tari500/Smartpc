@@ -1,4 +1,4 @@
-name: Check SmartPC Linux Engine Build
+name: Build SmartPC Linux Edition APK
 
 on:
   push:
@@ -10,11 +10,11 @@ permissions:
   contents: read
 
 jobs:
-  build-linux-engine:
-    name: Build Android-compatible Linux engine
+  build-smartpc-linux:
+    name: Build SmartPC with working Linux engine
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout SmartPC
+      - name: Checkout SmartPC workflow repository
         uses: actions/checkout@v4
 
       - name: Set up Java 17
@@ -23,68 +23,62 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK and NDK r27c
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
 
-      - name: Install Android build tools
+      - name: Install Android SDK components
         run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
-          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
-          echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          sdkmanager "platforms;android-37" "build-tools;37.0.0" "cmake;3.22.1"
 
       - name: Set up Rust for Android ARM64
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android
 
-      - name: Allow HTTPS access for upstream Git submodules
+      - name: Configure HTTPS for upstream submodules
         run: |
-          git config --global --add url."https://github.com/".insteadOf "git@github.com:"
-          git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-      - name: Download complete upstream Linux engine source
+      - name: Download complete Linux engine and Android application
         run: git clone --recurse-submodules --depth 1 https://github.com/oonid/pr.git linux-engine
 
-      - name: Build patched PRoot and Android loader
+      - name: Build Android ARM64 PRoot engine
         working-directory: linux-engine
         run: |
           chmod +x scripts/build.sh scripts/build-pr-cli.sh
           scripts/build.sh --arch=arm64
 
-      - name: Build pr-cli and embedded guest test binary
+      - name: Build pr-cli native executable
         working-directory: linux-engine
         run: scripts/build-pr-cli.sh
 
-      - name: Place native engine libraries
-        working-directory: linux-engine
+      - name: Brand the functional Linux app as SmartPC
+        working-directory: linux-engine/android
         run: |
-          mkdir -p android/proot-engine/src/main/jniLibs/arm64-v8a
-          cp build/out/arm64/proot android/proot-engine/src/main/jniLibs/arm64-v8a/libproot.so
-          cp build/out/arm64/loader android/proot-engine/src/main/jniLibs/arm64-v8a/libproot-loader.so
-          cp src/pr-cli/target/aarch64-linux-android/release/pr-cli android/proot-engine/src/main/jniLibs/arm64-v8a/libpr-cli.so
+          sed -i 's/applicationId = "id.or.oo.pr"/applicationId = "com.smartpc.mobile"/' app/build.gradle.kts
+          sed -i 's/<string name="app_name">PR<\//<string name="app_name">SmartPC<\//' app/src/main/res/values/strings.xml
 
-      - name: Build upstream engine library
+      - name: Build SmartPC Linux Android APK
         working-directory: linux-engine/android
         run: |
           chmod +x gradlew
-          ./gradlew :proot-engine:assembleDebug
+          ./gradlew --no-daemon :app:assembleDebug
 
-      - name: Set up Gradle for SmartPC
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+      - name: Verify APK contains native Linux engine
+        working-directory: linux-engine/android
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          unzip -l "$APK" | grep -E 'lib/arm64-v8a/(libptyjni.so|libproot.so|libpr-cli.so)'
+          echo "APK size: $(du -h "$APK" | cut -f1)"
 
-      - name: Build current SmartPC baseline APK
-        run: gradle assembleDebug
-
-      - name: Upload engine build outputs
+      - name: Upload SmartPC Linux APK
         uses: actions/upload-artifact@v4
         with:
-          name: SmartPC-Linux-Engine-Build-Test
-          path: |
-            linux-engine/android/proot-engine/build/outputs/aar/*.aar
-            app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: warn
-          retention-days: 14
+          name: SmartPC-Linux-APK
+          path: linux-engine/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
