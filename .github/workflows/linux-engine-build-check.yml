@@ -39,6 +39,11 @@ jobs:
         with:
           targets: aarch64-linux-android
 
+      - name: Allow HTTPS access for upstream Git submodules
+        run: |
+          git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+          git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
+
       - name: Download complete upstream Linux engine source
         run: git clone --recurse-submodules --depth 1 https://github.com/oonid/pr.git linux-engine
 
