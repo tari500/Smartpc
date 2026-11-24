@@ -74,6 +74,13 @@ jobs:
         working-directory: linux-engine
         run: python3 ../scripts/patch_upstream_desktop.py
 
+      - name: Bundle noVNC desktop viewer assets
+        run: |
+          git clone --depth 1 https://github.com/novnc/noVNC.git noVNC
+          mkdir -p linux-engine/android/app/src/main/assets/novnc
+          cp -a noVNC/. linux-engine/android/app/src/main/assets/novnc/
+          test -s linux-engine/android/app/src/main/assets/novnc/vnc.html
+
       - name: Brand the functional Linux app as SmartPC
         working-directory: linux-engine/android
         run: |
