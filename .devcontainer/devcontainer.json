@@ -1,0 +1,16 @@
+{
+  "name": "SmartPC Linux Desktop",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {},
+  "postCreateCommand": "bash .devcontainer/install-desktop.sh",
+  "postStartCommand": "bash .devcontainer/start-desktop.sh",
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "SmartPC Linux Desktop",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    }
+  },
+  "remoteUser": "vscode"
+}
