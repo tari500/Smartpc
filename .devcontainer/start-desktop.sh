@@ -5,14 +5,14 @@ mkdir -p "$HOME/.vnc"
 export DISPLAY=:1
 
 # Start a persistent virtual X display.
-if ! pgrep -u "$USER" -f '^Xvfb :1 ' >/dev/null 2>&1; then
+if ! pgrep -u "$USER" -f '[X]vfb :1' >/dev/null 2>&1; then
   Xvfb :1 -screen 0 1600x900x24 -dpi 110 -ac +extension RANDR >/tmp/smartpc-xvfb.log 2>&1 &
   for _ in {1..20}; do
-    pgrep -u "$USER" -f '^Xvfb :1 ' >/dev/null 2>&1 && break
+    pgrep -u "$USER" -f '[X]vfb :1' >/dev/null 2>&1 && break
     sleep 0.5
   done
 fi
-if ! pgrep -u "$USER" -f '^Xvfb :1 ' >/dev/null 2>&1; then
+if ! pgrep -u "$USER" -f '[X]vfb :1' >/dev/null 2>&1; then
   echo "ERROR: Xvfb did not start. See /tmp/smartpc-xvfb.log" >&2
   exit 1
 fi
