@@ -17,10 +17,11 @@ android {
     }
 
     defaultConfig {
-        applicationId 'com.smartpc.mobile'
+        // Separate package ID avoids signature/update conflicts with earlier SmartPC APKs.
+        applicationId 'com.smartpc.mobile.client'
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
     }
 }
