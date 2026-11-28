@@ -1,54 +1,11 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#07111f">
-<title>SmartPC</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#08111f"><title>SmartPC — Private Cloud Desktops</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#101f32;--line:#263b53;--muted:#9bb0c8;--blue:#43a5ff;--green:#42d6a0}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:#f4f8ff}
-body{background:radial-gradient(ellipse at 90% 0%,#123d66 0,transparent 42%),var(--bg);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-main{max-width:560px;margin:auto;padding:25px 20px 34px}
-.top{display:flex;align-items:center;gap:12px}.logo{height:48px;width:48px;border-radius:16px;background:linear-gradient(145deg,#79d5ff,#2878e5);display:grid;place-items:center;color:#061629;font-size:26px;font-weight:900;box-shadow:0 8px 24px #147bd544}
-h1{font-size:23px;margin:0;font-weight:800;letter-spacing:-.4px}.tag{font-size:12px;color:var(--muted);margin-top:3px}
-.hero{margin:28px 0 20px;padding:22px;border:1px solid #2c5274;border-radius:23px;background:linear-gradient(145deg,#12395c,#10243a 75%);box-shadow:0 18px 45px #0003}
-.eyebrow{font-size:11px;letter-spacing:1.3px;color:#8dcfff;font-weight:800}.hero h2{font-size:24px;line-height:1.15;margin:10px 0}.hero p{font-size:14px;line-height:1.55;color:#bfd2e5;margin:0}
-.status{display:flex;align-items:center;gap:8px;margin-top:18px;font-size:12px;color:#d9e8f6}.dot{width:8px;height:8px;border-radius:50%;background:#7f91a5}
-.card{background:#0d1b2c;border:1px solid var(--line);border-radius:20px;padding:19px;margin:14px 0}
-.card h3{font-size:16px;margin:0 0 7px}.desc{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 14px}
-label{display:block;font-size:12px;color:#b8cbe0;font-weight:650;margin:14px 0 7px}
-input{width:100%;height:50px;border:1px solid #344d68;border-radius:13px;background:#071321;color:#fff;padding:0 13px;font-size:14px;outline:none}
-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #43a5ff22}
-button{font:inherit;cursor:pointer}.primary{width:100%;height:52px;border:0;border-radius:14px;background:linear-gradient(100deg,#49baff,#327ee9);color:#06172a;font-weight:850;font-size:15px;margin-top:14px;box-shadow:0 8px 22px #237fd933}
-.secondary{width:100%;height:46px;border:1px solid #344d68;border-radius:13px;background:#13243a;color:#dcecff;font-weight:650;margin-top:10px}
-.tip{font-size:12px;line-height:1.55;color:#9eb4ca;margin:12px 2px 0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.feature{padding:14px;border:1px solid var(--line);border-radius:15px;background:#0d1b2c}.ico{font-size:21px;margin-bottom:8px}.feature b{display:block;font-size:13px}.feature span{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px}
-.footer{text-align:center;color:#70869e;font-size:11px;margin:24px 0 4px}
-</style></head>
-<body><main>
-<header class="top"><div class="logo">S</div><div><h1>SmartPC</h1><div class="tag">Your computer, in your pocket</div></div></header>
-<section class="hero"><div class="eyebrow">REMOTE DESKTOP</div><h2>A simple PC experience<br>on your Android phone.</h2><p>Connect securely to your SmartPC Linux desktop and control it with your touchscreen.</p><div class="status"><span class="dot" id="dot"></span><span id="status">Not connected · Ready to connect</span></div></section>
-<section class="card">
-<h3>Connect to your computer</h3><p class="desc">Paste the HTTPS address for your Codespaces port 6080. SmartPC will remember it on this phone.</p>
-<label for="address">Desktop address</label>
-<input id="address" type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="https://your-codespace-6080.app.github.dev">
-<button class="primary" onclick="connect()">Connect to my PC&nbsp; →</button>
-<button class="secondary" onclick="save()">Save address</button>
-<p class="tip">Your Codespace must be running and port 6080 must be forwarded. The first connection may ask you to sign in to GitHub.</p>
-</section>
-<div class="grid">
-<div class="feature"><div class="ico">👆</div><b>Touch friendly</b><span>Designed for phone screens and finger controls.</span></div>
-<div class="feature"><div class="ico">⌨️</div><b>Keyboard ready</b><span>Use your Android keyboard when working remotely.</span></div>
-<div class="feature"><div class="ico">🖥️</div><b>Linux desktop</b><span>Access your Ubuntu XFCE desktop remotely.</span></div>
-<div class="feature"><div class="ico">🔒</div><b>Private connection</b><span>Uses your private GitHub Codespaces port.</span></div>
-</div>
-<div class="footer">SMARTPC · ANDROID EDITION</div>
-</main>
-<script>
-const field=document.getElementById('address');
-function saved(){try{return window.SmartPC?SmartPC.getSavedUrl():''}catch(e){return ''}}
-field.value=saved();
-function save(){const v=field.value.trim();if(!v){alert('Paste your Codespaces port 6080 address first.');return}if(window.SmartPC)SmartPC.saveUrl(v);document.getElementById('status').textContent='Address saved on this phone';document.getElementById('dot').style.background='#42d6a0'}
-function connect(){const v=field.value.trim();if(!v){field.focus();alert('Paste your Codespaces port 6080 address first.');return}if(window.SmartPC){SmartPC.saveUrl(v);document.getElementById('status').textContent='Connecting to your computer…';document.getElementById('dot').style.background='#f2bd58';SmartPC.connect(v)}else{alert('Open SmartPC from the Android app to connect.')}}
-</script></body></html>
+:root{color-scheme:dark;--bg:#08111f;--panel:#0e1b2c;--line:#263b55;--muted:#9aadc5}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 85% 0%,#153d65 0,transparent 38%),var(--bg);color:#f4f8ff;font-family:Inter,system-ui,Roboto,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}main{max-width:720px;margin:auto;padding:24px 18px 36px}header{display:flex;align-items:center;gap:12px}.logo{height:46px;width:46px;border-radius:15px;background:linear-gradient(145deg,#8bdcff,#2878e5);display:grid;place-items:center;color:#061629;font-size:25px;font-weight:950}.brand{font-size:21px;font-weight:850}.sub{font-size:11px;color:var(--muted);letter-spacing:.5px}.pill{margin-left:auto;border:1px solid #42536a;background:#17263a;color:#c1d0e1;border-radius:30px;padding:7px 10px;font-size:10px;font-weight:750}.hero{margin:26px 0 16px;padding:24px 21px;border:1px solid #315779;border-radius:23px;background:linear-gradient(145deg,#153f65,#10243a 75%);box-shadow:0 18px 45px #0003}.eyebrow{font-size:10px;letter-spacing:1.6px;color:#8fd3ff;font-weight:850}.hero h1{font-size:clamp(28px,7vw,38px);line-height:1.08;letter-spacing:-1px;margin:12px 0}.hero p{font-size:14px;line-height:1.6;color:#c1d4e8;margin:0}.status{display:flex;align-items:center;gap:8px;margin-top:20px;font-size:11px;color:#d4e5f4}.dot{height:8px;width:8px;border-radius:50%;background:#e8b65b;box-shadow:0 0 0 4px #e8b65b20}.card,.feature{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin:13px 0}.card h2{font-size:16px;margin:0 0 7px}.desc{font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 15px}.launch{width:100%;min-height:52px;border:0;border-radius:14px;background:linear-gradient(100deg,#59c2ff,#347fe9);color:#06172a;font-size:14px;font-weight:850;opacity:.62}.notice{display:flex;gap:10px;background:#18263a;border:1px solid #354c68;border-radius:13px;padding:12px;margin-top:13px;color:#b9cbe0;font-size:11px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0}.feature{margin:0;padding:14px;min-height:104px}.ico{font-size:21px;margin-bottom:8px}.feature b{display:block;font-size:12px}.feature span{display:block;color:var(--muted);font-size:11px;line-height:1.45;margin-top:4px}.steps{display:grid;gap:13px;margin-top:14px}.step{display:flex;gap:12px}.num{height:27px;width:27px;flex:none;border-radius:9px;background:#1a3b5d;color:#8ed2ff;display:grid;place-items:center;font-size:12px;font-weight:850}.step b{font-size:12px;display:block;margin:1px 0 3px}.step span{font-size:11px;color:var(--muted);line-height:1.45}.footer{text-align:center;color:#71869f;font-size:10px;margin:24px 0 4px;letter-spacing:.7px}@media(min-width:600px){main{padding-top:32px}.hero{padding:30px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style></head><body><main>
+<header><div class="logo">S</div><div><div class="brand">SmartPC</div><div class="sub">PRIVATE CLOUD DESKTOPS</div></div><div class="pill">MULTI-USER</div></header>
+<section class="hero"><div class="eyebrow">YOUR OWN LINUX COMPUTER</div><h1>One person.<br>One private desktop.</h1><p>Launch a separate Linux workspace from your phone, tablet or computer. Each user gets their own files, apps and desktop session.</p><div class="status"><span class="dot"></span><span>Cloud desktop server setup is not connected yet</span></div></section>
+<section class="card"><h2>Start your private desktop</h2><p class="desc">Guest mode is being designed to create an isolated Linux desktop for each visitor. No GitHub account will be needed to access a guest session.</p><button class="launch" type="button" disabled>Cloud desktop — coming online soon</button><div class="notice"><span>🔒</span><span>Your desktop will be separated from other users. Session storage, time limits and secure access will be managed by the SmartPC server.</span></div></section>
+<div class="grid"><div class="feature"><div class="ico">🗂️</div><b>Your own files</b><span>Private storage for each desktop.</span></div><div class="feature"><div class="ico">🌐</div><b>Your own browser</b><span>Independent browsing session.</span></div><div class="feature"><div class="ico">⌨️</div><b>Linux terminal</b><span>Run commands in your own workspace.</span></div><div class="feature"><div class="ico">📱</div><b>Any device</b><span>Connect through Android or a web link.</span></div></div>
+<section class="card"><h2>How SmartPC will work</h2><div class="steps"><div class="step"><div class="num">1</div><div><b>Open SmartPC</b><span>Visit the app or your SmartPC web link. No GitHub sign-in for guests.</span></div></div><div class="step"><div class="num">2</div><div><b>Create a desktop</b><span>The server starts a separate Linux environment for that visitor.</span></div></div><div class="step"><div class="num">3</div><div><b>Work privately</b><span>Your files and session are isolated from other users.</span></div></div></div></section>
+<div class="footer">SMARTPC · CLOUD LINUX DESKTOP</div></main></body></html>
