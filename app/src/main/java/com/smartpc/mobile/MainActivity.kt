@@ -78,7 +78,6 @@ class MainActivity : Activity() {
         val finalUrl = "$page?$query"
         prefs.edit().putString("desktop_url", page).apply()
         showingDesktop = true
-        web.settings.userAgentString = WebView(this).settings.userAgentString
         web.loadUrl(finalUrl)
     }
 
