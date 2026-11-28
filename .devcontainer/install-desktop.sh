@@ -1,25 +1,28 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
-# Install every component required by the remote desktop, not just XFCE.
+# Install the complete XFCE + virtual display + VNC + browser gateway stack.
 required_commands=(xfce4-session Xvfb x11vnc websockify dbus-launch)
-missing=0
+missing=()
 for cmd in "${required_commands[@]}"; do
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    missing=1
-    break
-  fi
+  command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
 done
 
-if [ "$missing" -eq 1 ] || [ ! -f /usr/share/novnc/vnc.html ]; then
+if (("${#missing[@]}" > 0)) || [[ ! -f /usr/share/novnc/vnc.html ]]; then
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     xfce4 xfce4-terminal dbus-x11 xvfb x11vnc novnc websockify
 fi
 
-# Confirm the noVNC web client was installed.
-if [ ! -f /usr/share/novnc/vnc.html ]; then
-  echo "ERROR: noVNC web files were not found at /usr/share/novnc."
+# Fail here with a useful message rather than leaving a half-working Codespace.
+for cmd in "${required_commands[@]}"; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "ERROR: required desktop command is still missing: $cmd" >&2
+    exit 1
+  fi
+done
+if [[ ! -f /usr/share/novnc/vnc.html ]]; then
+  echo "ERROR: noVNC was installed but /usr/share/novnc/vnc.html is missing." >&2
   exit 1
 fi
 
