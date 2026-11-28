@@ -5,7 +5,7 @@ mkdir -p "$HOME/.vnc"
 
 # Start a virtual display if one is not already running.
 if ! pgrep -f '[X]vfb :1' >/dev/null 2>&1; then
-  Xvfb :1 -screen 0 1280x800x24 -ac +extension RANDR >/tmp/smartpc-xvfb.log 2>&1 &
+  Xvfb :1 -screen 0 1600x900x24 -dpi 110 -ac +extension RANDR >/tmp/smartpc-xvfb.log 2>&1 &
   sleep 2
 fi
 
